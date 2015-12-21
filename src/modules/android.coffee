@@ -153,8 +153,9 @@ processStandardImage = (file, callback) ->
   if file.width % 4 isnt 0 or file.height % 4 isnt 0
     process.stdout.write "WARNING: Image #{ file.basename } dimensions are not multiples of 4. Skipping.\n"
     return callback()
-    
-  fileDestination = temporaryDirectory + 'drawable-' + file.density + '/' + file.basename
+
+  filename = file.basename.replace /\@4x.png$/, '.png'
+  fileDestination = temporaryDirectory + 'drawable-' + file.density + '/' + filename
 
   file.image
   # ImageMagic adds png date chunk that makes otherwise-identical PNGs different to VCSes.
@@ -163,7 +164,7 @@ processStandardImage = (file, callback) ->
   .resize Math.round(file.width * file.scaleFactor), Math.round(file.height * file.scaleFactor), '!'
   .write fileDestination, (error) ->
     process.stdout.write error if error
-    process.stdout.write "Saved  #{ file.basename } in #{ file.density } density.\n" if options.verbose
+    process.stdout.write "Saved  #{ filename } in #{ file.density } density.\n" if options.verbose
     callback()
 
 processNoDpiImage = (file, callback) ->
@@ -215,6 +216,9 @@ module.exports = (passedInputDirectory, passedOutputDirectory = false, passedOpt
   for file in fs.readdirSync(inputDirectory)
     # Skip hidden or underscored files
     continue if file.slice(0, 1) is '.' or file.slice(0, 1) is '_'
+
+    # we only want @4x.png assets
+    continue unless /\@4x.png$/.test file
 
     # Skip folders and warn
     unless fs.lstatSync( path.resolve(inputDirectory, file) ).isFile()
