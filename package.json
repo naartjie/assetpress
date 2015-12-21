@@ -36,8 +36,8 @@
   "main": "./lib/assetpress.js",
   "scripts": {
     "compile": "coffee --no-header --bare --output lib --compile src",
-    "prepublish": "npm compile",
-    "postinstall": "npm compile"
+    "prepublish": "npm run compile",
+    "postinstall": "npm run compile"
   },
   "dependencies": {
     "async": "^0.9.0",
