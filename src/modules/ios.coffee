@@ -26,11 +26,11 @@ defaults =
   xcassets: false
 
 processImage = (task, callback) ->
-  
+
   info = task.info # Entire descriptor
   scaleKey = '' + task.scale # Lookup key
   highestScale = info.devices[task.device].highestScale
-  
+
   # iOS scaling naming: nothing, @2x, @3x...
   scaleSuffix = if task.scale is 1 then '' else "@#{ task.scale }x"
   # Universal resources are simply icon@2x.png, device specific are icon@2x~iphone.png
@@ -207,7 +207,7 @@ describeInputDirectory = (inputDirectory) ->
   for identifier of grouped
     groupPaths = grouped[identifier]
 
-    descriptor = 
+    descriptor =
       id: identifier
       basename: path.basename identifier
       extension: path.extname groupPaths[0]
@@ -215,10 +215,10 @@ describeInputDirectory = (inputDirectory) ->
 
     descriptor.foldername = path.dirname identifier
     if descriptor.foldername is '.' then descriptor.foldername = '' else descriptor.foldername += '/'
-    
+
     # Normalize JPEG extension for later.
     descriptor.extension = '.jpg' if descriptor.extension == '.jpeg'
-      
+
     for filepath in groupPaths
       # Scale
       scaleMatch = filepath.match /@(\d+)x/
@@ -238,8 +238,8 @@ describeInputDirectory = (inputDirectory) ->
     # In Xcassets folder both device-specific and universal resources are not allowed,
     # If descriptor.devices has both, univeral is removed.
     if (
-      options.xcassets and 
-      ( _.has(descriptor.devices, 'iphone') or _.has(descriptor.devices, 'ipad') ) and 
+      options.xcassets and
+      ( _.has(descriptor.devices, 'iphone') or _.has(descriptor.devices, 'ipad') ) and
       _.has(descriptor.devices, 'universal') and
       !( identifier.indexOf('AppIcon') == 0 or identifier.indexOf('Default') == 0 )
     )
@@ -254,7 +254,7 @@ module.exports = (passedInputDirectory, passedOutputDirectory = false, passedOpt
   outputDirectory = passedOutputDirectory
   options = _.defaults passedOptions, defaults
   unless callback then callback = -> # noop
-  
+
   # Numberify options
   options.minimum = parseInt options.minimum
   options.maximum = parseInt options.maximum
@@ -263,7 +263,7 @@ module.exports = (passedInputDirectory, passedOutputDirectory = false, passedOpt
   options.minimumPad = parseInt options.minimumPad
   options.maximumPad = parseInt options.maximumPad
 
-  outputDirectoryName = if passedOutputDirectory then util.removeTrailingSlash(passedOutputDirectory) else 'Images' 
+  outputDirectoryName = if passedOutputDirectory then util.removeTrailingSlash(passedOutputDirectory) else 'Images'
   outputDirectoryName += '.xcassets' if options.xcassets and !_.endsWith(outputDirectoryName, '.xcassets')
 
   outputDirectoryBase = util.resolvePath inputDirectory, '..'
@@ -273,7 +273,7 @@ module.exports = (passedInputDirectory, passedOutputDirectory = false, passedOpt
   temporaryDirectory = util.addTrailingSlash temporaryDirectoryObject.path
 
   queue = async.queue processImage, 1
-  queue.drain = -> 
+  queue.drain = ->
     # These are the final actions: moving results from temporary folder to final output
     util.move temporaryDirectory, outputDirectory, options.clean
     # And removing temporary folder.
@@ -286,7 +286,7 @@ module.exports = (passedInputDirectory, passedOutputDirectory = false, passedOpt
 
   # Image descriptors is the master data, that describes all image groups
   imageDescriptors = describeInputDirectory inputDirectory
-  
+
   # Very useful debug line
   # console.log require('util').inspect(imageDescriptors, false, null)
 
@@ -319,7 +319,7 @@ module.exports = (passedInputDirectory, passedOutputDirectory = false, passedOpt
         for scale of descriptor.devices[device]
           # TODO all these 3 lines - what do they do?
           if scale is 'highestScale'
-            scale++ 
+            scale++
             continue
 
           scale = parseInt scale

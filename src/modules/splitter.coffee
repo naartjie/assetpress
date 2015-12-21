@@ -15,10 +15,10 @@ defaults =
   clean: false
 
 module.exports = (
-  source = process.cwd(), 
-  resourcesDestination = './resources', 
-  screensDestination = './screens', 
-  passedOptions = {}, 
+  source = process.cwd(),
+  resourcesDestination = './resources',
+  screensDestination = './screens',
+  passedOptions = {},
   callback = false) ->
 
   options = _.defaults passedOptions, defaults
@@ -52,5 +52,5 @@ module.exports = (
   util.move tmpScreensDirectory, screensDestinationDirectory, options.clean
 
   fs.removeSync temporaryDirectory
-  
+
   callback()

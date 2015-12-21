@@ -15,7 +15,7 @@ outputDirectory = ''
 options = {}
 defaults =
   verbose: false
-  
+
 supportedModifiers = [ 'template', '9' ]
 
 hasAnyModifier = (basename) ->
@@ -46,14 +46,14 @@ removeModifier = (modifier, filenames, directory, contents, basename) ->
 runTemplateModifier = (filenames, directory, contents, basename, callback) ->
   contents.info['template-rendering-intent'] = 'template'
   completedModifierAction 'template', filenames, directory, contents, basename, callback
-  
+
 remove9Patches = (filesToCrop, filenames, directory, contents, basename, callback) ->
   if filesToCrop.length
     fileToCrop = filesToCrop.pop()
     scaledPatchInfo = fileToCrop.match /@(\d+)x/i
     imageScale = if scaledPatchInfo then parseInt(scaledPatchInfo[1]) else 1
     imagePath = path.resolve outputDirectory, directory, fileToCrop
-    
+
     cropImage = im(imagePath)
     cropImage.size (err, size) ->
       cropImage
@@ -79,7 +79,7 @@ readPixelRow = (data, row, scale) ->
       for y in [scale..(data.height - 1 - scale)] by scale
         offset = (y * data.width + x) * 4
         alphas.push data.data[ offset + 3 ]
-  
+
   groups = []
   currentGroup = [ 0, ( alphas[0] > 128 ) ]
   for alpha in alphas
@@ -88,7 +88,7 @@ readPixelRow = (data, row, scale) ->
       currentGroup = [ 0, ( alpha > 128 ) ]
     currentGroup[0] += 1
   groups.push _.clone(currentGroup)
-  
+
   result = { startInset: 0, center: 0, endInset: 0 }
   # Patch with both insets off-on-off
   if groups.length is 3 and groups[0][1] is false and groups[1][1] is true and groups[2][1] is false
@@ -110,11 +110,11 @@ readPixelRow = (data, row, scale) ->
   # False return means either incorrectly drawn patch or empty patch, which implies no tiling
   else return false
   return result
-      
+
 getResizingObject = (data, scale) ->
   topRowInfo = readPixelRow data, 'top', scale
   leftRowInfo = readPixelRow data, 'left', scale
-  
+
   if topRowInfo or leftRowInfo
     resizing = {
       mode: '',
@@ -123,14 +123,14 @@ getResizingObject = (data, scale) ->
       },
       capInsets: {}
     }
-    
+
     if topRowInfo and leftRowInfo
       resizing.mode = '9-part'
     else if topRowInfo
       resizing.mode = '3-part-horizontal'
     else
       resizing.mode = '3-part-vertical'
-    
+
     if topRowInfo
       resizing.center.width = topRowInfo.center
       resizing.capInsets.left = topRowInfo.startInset
@@ -139,7 +139,7 @@ getResizingObject = (data, scale) ->
       resizing.center.height = leftRowInfo.center
       resizing.capInsets.top = leftRowInfo.startInset
       resizing.capInsets.bottom = leftRowInfo.endInset
-    
+
     return resizing
   else return false
 
@@ -147,7 +147,7 @@ run9PatchModifier = (filenames, directory, contents, basename, callback) ->
   scaledPatchInfo = filenames[0].match /@(\d+)x/i
   imageScale = if scaledPatchInfo then parseInt(scaledPatchInfo[1]) else 1
   imagePath = path.resolve(outputDirectory, directory, filenames[0])
-  
+
   pngparse.parseFile imagePath, (err, data) ->
     process.stdout.write err if err
     resizingObject = getResizingObject data, imageScale
@@ -157,7 +157,7 @@ run9PatchModifier = (filenames, directory, contents, basename, callback) ->
       filename = stringWithoutModifiers filename
       scaledPatchInfo = filename.match /@(\d+)x/i
       imageScale = if scaledPatchInfo then parseInt(scaledPatchInfo[1]) else 1
-      
+
       scaledResizingObject = _.cloneDeep resizingObject
       scaledResizingObject.center.width *= imageScale if scaledResizingObject.center.width
       scaledResizingObject.center.height *= imageScale if scaledResizingObject.center.height
@@ -165,17 +165,17 @@ run9PatchModifier = (filenames, directory, contents, basename, callback) ->
       scaledResizingObject.capInsets.right *= imageScale if scaledResizingObject.capInsets.right
       scaledResizingObject.capInsets.bottom *= imageScale if scaledResizingObject.capInsets.bottom
       scaledResizingObject.capInsets.left *= imageScale if scaledResizingObject.capInsets.left
-      
+
       contents['__additions'][filename] = { resizing: scaledResizingObject }
-      
+
     filesToCrop = _.clone filenames
     remove9Patches filesToCrop, filenames, directory, contents, basename, callback
-  
+
 completedModifierAction = (modifier, filenames, directory, contents, basename, callback) ->
   [ filenames, directory, contents, basename ] = removeModifier modifier, filenames, directory, contents, basename
   if hasAnyModifier basename
     runModifierActions filenames, directory, contents, basename, callback
-  else 
+  else
     completeContentsJSONForImage filenames, directory, contents, basename, callback
 
 runModifierActions = (filenames, directory, contents, basename, callback) ->
@@ -187,7 +187,7 @@ runModifierActions = (filenames, directory, contents, basename, callback) ->
 
 contentsJSONForImage = (filenames, directory, callback) ->
   # Initial contents
-  contents = 
+  contents =
     images: []
     info:
       version: 1
@@ -197,12 +197,12 @@ contentsJSONForImage = (filenames, directory, callback) ->
   directoryName = directory.split('/').pop()
   # Basename is logo
   basename = directoryName.slice 0, path.extname(directoryName).length * -1
-  
+
   if hasAnyModifier basename
     runModifierActions filenames, directory, contents, basename, callback
-  else 
+  else
     completeContentsJSONForImage filenames, directory, contents, basename, callback
-  
+
 completeContentsJSONForImage = (filenames, directory, contents, basename, callback) ->
   # Grab first filename
   firstFilename = filenames[0]
@@ -212,7 +212,7 @@ completeContentsJSONForImage = (filenames, directory, contents, basename, callba
   extension = path.extname firstFilename
   # For JPGs it is (was?) recommended to set 'template-rendering-intent' to 'original'
   contents.info['template-rendering-intent'] = 'original' if extension is '.jpg'
-  
+
   # A very important nuance of XCAssets Contents.json is that it lists all possible icons,
   # and some of them are simply listed without 'filename' key.
   # So we need to construct a list of all possible names, and later check if file exists.
@@ -247,7 +247,7 @@ completeContentsJSONForImage = (filenames, directory, contents, basename, callba
     # scale: 1x, 2x, 3x
     scale = possibleName.match /@(\d+)x/
     scale = if scale then scale[1] + 'x' else '1x'
-    imageInfo = 
+    imageInfo =
       idiom: idiom
       scale: scale
     # filename field only added if file actually exists
@@ -263,13 +263,13 @@ completeContentsJSONForImage = (filenames, directory, contents, basename, callba
 
 contentsJSONForAppIcon = (filenames, directory) ->
   # Initial contents
-  contents = 
+  contents =
     images: []
     info:
       version: 1
       author: AUTHOR
     properties: 'pre-rendered': true
-  # The difficulty with App Icons and Launch Images is that 
+  # The difficulty with App Icons and Launch Images is that
   # you need to include entire group even only one icon exists in that group.
   # This is the function of resourceListWithRequiredGroups()
   filteredAppIconList = iOSConstants.resourceListWithRequiredGroups filenames, iOSConstants.appIconGroups, 'AppIcon'
@@ -285,7 +285,7 @@ contentsJSONForAppIcon = (filenames, directory) ->
       # appIconInfo.conflicts might be [ 'AppIcon-Legacy-Small@2x~iphone.png' ]
       # merged is both in one array.
       merged = _.union [ appIconName ], appIconInfo.conflicts
-      # Intersection of filenames and and merged can be 
+      # Intersection of filenames and and merged can be
       # either 1 (no conflicts) or more (if there are conflicts)
       if _.intersection(filenames, merged).length > 1
         # If there exists at least one conflict, remove all conflicting icons
@@ -317,7 +317,7 @@ contentsJSONForAppIcon = (filenames, directory) ->
       scaledSize = Math.round appIconInfo.size / scale
       size = scaledSize + 'x' + scaledSize
 
-    imageInfo = 
+    imageInfo =
       size: size
       idiom: idiom
       scale: scale + 'x'
@@ -335,7 +335,7 @@ contentsJSONForAppIcon = (filenames, directory) ->
 
 contentsJSONForLaunchImage = (filenames, directory) ->
   # Initial contents
-  contents = 
+  contents =
     images: []
     info:
       version: 1
@@ -353,7 +353,7 @@ contentsJSONForLaunchImage = (filenames, directory) ->
 
     orientation = if /landscape/i.test(launchImageName) then 'landscape' else 'portrait'
 
-    imageInfo = 
+    imageInfo =
       extent: 'full-screen'
       idiom: idiom
       orientation: orientation
@@ -414,5 +414,5 @@ module.exports = (passedOutputDirectory, passedOptions, callback) ->
         process.stdout.write "Created Contents.json for #{ resultingDirectory }\n" if options.verbose
 
 
-    
+
   callback()

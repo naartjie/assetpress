@@ -21,11 +21,11 @@ doc = """
       Usage: assetpress [options] input
         -i, --ios         iOS mode. Default, flag is not necessary.
         -a, --android     Android mode.
-            --input       Input directory. Flag not necessary, 
+            --input       Input directory. Flag not necessary,
                           any free argument is considered input.
         -o, --output      Output directory. Default depends on OS mode.
         -s, --screens     Screens directory
-            --no-resize   Don't perform any image resizing. 
+            --no-resize   Don't perform any image resizing.
                           Use when you only want split screens and images.
         -c, --clean       Clean output directory before outputting.
         -v, --verbose     Verbose output.
@@ -59,8 +59,8 @@ doc = """
       AssetPress will skip files that are not sized in multiples of 4.
       For detailed documentation about these features see the README.
             --android-ldpi      Enable LDPI size generation.
-            --android-xxxhdpi   Enable XXHDPI size generation. 
-                                Despite being the source of all other sizes, by 
+            --android-xxxhdpi   Enable XXHDPI size generation.
+                                Despite being the source of all other sizes, by
                                 default XXXHDPI size is not generated.
 
       """

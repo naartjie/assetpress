@@ -4,7 +4,7 @@ _ = require 'lodash'
 module.exports.resizeFilter = 'Box'
 
 # Resizing exceptions
-module.exports.scalerExceptions = 
+module.exports.scalerExceptions =
   'Default-Landscape736h': minDensity: 3
   'Default-Portrait736h': minDensity: 3
 
@@ -32,7 +32,7 @@ module.exports.xcassetsAllowedExtensions = [
 ]
 
 # Definitions of all App Icons as of Xcode 6.3
-appIconGroups = 
+appIconGroups =
   iOS8:
     'AppIcon-Settings@3x~iphone.png':
       size: 87
@@ -131,7 +131,7 @@ module.exports.appIconGroups = appIconGroups
 module.exports.appIconList = appIconList
 
 # Definitions of all Launch Images as of Xcode 6.3
-launchImageGroups = 
+launchImageGroups =
   iOS8Portrait:
     'Default-667h@2x~iphone.png':
       minimumSystemVersion: '8.0'
@@ -282,7 +282,7 @@ module.exports.getImageSubtype = (filename) ->
   iconInfo = module.exports.getAppIconInfo filename
   if iconInfo and iconInfo.settingSubtype
     return iconInfo.settingSubtype
-    
+
   # Launch images have height subtype, for instance 667h
   heightSubtype = filename.match /(\d+)h/
   if heightSubtype
@@ -291,7 +291,7 @@ module.exports.getImageSubtype = (filename) ->
     # Xcode format is a wonderful study of legacy notations.
     return 'retina4' if number is 568
     return number + 'h'
-    
+
   # Watch resources have mm subtypes.
   watchSubtype = filename.match(/(\d+)mm/)
   if watchSubtype
