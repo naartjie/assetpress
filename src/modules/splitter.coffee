@@ -35,13 +35,21 @@ module.exports = (
 
   tmpResourcesDirectory = temporaryDirectory + 'resources'
   tmpScreensDirectory = temporaryDirectory + 'screens'
-  
+
   fs.mkdirsSync tmpResourcesDirectory
   fs.mkdirsSync tmpScreensDirectory
 
   for filename in fs.readdirSync sourceDirectory
+
     # The magic of splitter: moves everything named starting with <NUMBER>.<NUMBER> to screens, anything else to resources
-    if /^(\d+)\.(\d+)/.test(filename)
+    # if /^(\d+)\.(\d+)/.test(filename)
+    if /^Screens\ $/.test filename
+      for screen in fs.readdirSync path.resolve(sourceDirectory, filename)
+        src = path.resolve sourceDirectory, filename, screen
+        dst = path.resolve tmpScreensDirectory, screen.trim()
+        fs.renameSync src, dst
+
+    else if /^(\d+)\.(\d+)/.test filename
       fs.renameSync path.resolve(sourceDirectory, filename), path.resolve(tmpScreensDirectory, filename)
       process.stdout.write "Screen #{ filename } moved.\n" if options.verbose
     else

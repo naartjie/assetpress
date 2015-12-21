@@ -175,6 +175,8 @@ describeInputDirectory = (inputDirectory) ->
 
   filtered = _.filter paths, (filepath) ->
 
+    return no unless /\@[2-4]x.png$/.test filepath
+
     # Drop if not a file (we can't resize a directory)
     return false if !fs.lstatSync( path.resolve(inputDirectory, filepath) ).isFile()
 
@@ -189,6 +191,7 @@ describeInputDirectory = (inputDirectory) ->
 
     # Drop everything that has _ anywhere in path
     pathSegments = util.removeTrailingSlash(filepath).split '/'
+
     return false for segment in pathSegments when segment.slice(0, 1) is '_'
 
     # Everything else shall pass
@@ -225,7 +228,13 @@ describeInputDirectory = (inputDirectory) ->
       scale = if scaleMatch then parseInt scaleMatch[1] else 1
       # Device
       deviceMatch = filepath.match /~([a-z]+)/i
-      device = if deviceMatch then deviceMatch[1].toLowerCase() else 'universal'
+
+      # device = if deviceMatch then deviceMatch[1].toLowerCase() else 'universal'
+
+      ## Hard-coding device to iphone
+      device = 'iphone'
+
+
       # Add this, so its descriptor.devices.universal.2
       descriptor.devices[device] = {} if !_.has descriptor.devices, device
       descriptor.devices[device][scale] = path.resolve inputDirectory, filepath
@@ -290,7 +299,9 @@ module.exports = (passedInputDirectory, passedOutputDirectory = false, passedOpt
   # Very useful debug line
   # console.log require('util').inspect(imageDescriptors, false, null)
 
-  for device in iOSConstants.deviceTypes
+  # for device in iOSConstants.deviceTypes
+  for device in ['iphone']
+
     # min and max densities make sure that all needed scales are created.
     # min and max absolute densities make sure that impossible scales (4x+) are not created.
     [ minDensity, maxDensity, absoluteMinDensity, absoluteMaxDensity ] = iOSConstants.getDensityLimits(device, options)
