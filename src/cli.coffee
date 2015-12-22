@@ -1,6 +1,3 @@
-`#!/usr/bin/env node
-`
-
 fs = require 'fs-extra'
 path = require 'path'
 
