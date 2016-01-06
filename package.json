@@ -35,7 +35,7 @@
   },
   "main": "./lib/assetpress.js",
   "bin": {
-    "assetpress": "./lib/cli.js"
+    "assetpress": "./cli-wrapper.sh"
   },
   "scripts": {
     "compile": "coffee --no-header --bare --output lib --compile src",
